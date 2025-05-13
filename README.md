@@ -1,5 +1,5 @@
 
-#⚙️ Lab Setup Guide
+# ⚙️ Lab Setup Guide
 This section walks through setting up the full virtual lab environment, including Kali Linux (Attacker), Windows 11 (Workstation), Windows Server (Domain Controller/File Server), and Splunk (SIEM) using VirtualBox.
 
 🧰 Requirements
