@@ -136,4 +136,4 @@ Start simulating attacks using Kali (port scans, SMB enumeration, brute-force, e
 
 Forward logs into Splunk for correlation and dashboard creation
 
-Let me know if you'd like me to generate the network diagram, Splunk dashboard JSON template, or a starter detection rule you can include in your repo.
+
