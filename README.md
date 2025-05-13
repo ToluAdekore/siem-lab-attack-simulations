@@ -1,139 +1,167 @@
-
 # ⚙️ Lab Setup Guide
-This section walks through setting up the full virtual lab environment, including Kali Linux (Attacker), Windows 11 (Workstation), Windows Server (Domain Controller/File Server), and Splunk (SIEM) using VirtualBox.
 
-🧰 Requirements
-VirtualBox (latest version)
+This section walks through setting up the full virtual lab environment using **VirtualBox**, including:
 
-At least 100 GB disk space and 16 GB RAM recommended
+- 🐉 **Kali Linux** (Attacker)
+- 🧑‍💻 **Windows 11** (Workstation Target)
+- 🗂️ **Windows Server** (Domain Controller / File Server)
+- 📊 **Splunk** (SIEM)
 
-Internet access (for ISO downloads)
+---
 
-Optional: Enable VT-x/AMD-V in BIOS for performance
+## 🧰 Requirements
 
-🖥️ Step 1: Install All VMs
-✅ 1. Kali Linux (Attacker VM)
-Download:
+- [VirtualBox](https://www.virtualbox.org/) (latest version)
+- Minimum **100 GB** disk space
+- At least **16 GB RAM**
+- Internet access (for ISO downloads)
+- VT-x/AMD-V enabled in BIOS (optional, but improves performance)
 
-https://www.kali.org/get-kali/#kali-virtual-machines
+---
 
-Choose the VirtualBox prebuilt image
+## 🖥️ Step 1: Install All VMs
 
-Steps:
+---
 
-Import the Kali .ova file via VirtualBox (File > Import Appliance)
+### ✅ Kali Linux (Attacker VM)
 
-Boot the VM and update packages:
+**Download:**  
+🔗 [https://www.kali.org/get-kali/#kali-virtual-machines](https://www.kali.org/get-kali/#kali-virtual-machines)  
+Choose the **VirtualBox prebuilt image (.ova)**
 
-bash
-Copy
-Edit
-sudo apt update && sudo apt upgrade -y
-✅ 2. Windows 11 (Workstation Target)
-Download ISO:
+**Steps:**
+1. In VirtualBox: `File > Import Appliance`
+2. Select the downloaded `.ova` file
+3. Boot the VM and update:
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+````
 
-https://www.microsoft.com/software-download/windows11
+---
 
-Steps:
+### ✅ Windows 11 (Workstation Target)
 
-In VirtualBox: New > Windows 11
+**Download ISO:**
+🔗 [https://www.microsoft.com/software-download/windows11](https://www.microsoft.com/software-download/windows11)
 
-Allocate 4–8 GB RAM, 2+ CPUs, 60+ GB disk
+**Steps:**
 
-Attach ISO under Settings > Storage > Controller: SATA
+1. Create a new VM: `New > Windows 11`
+2. Set:
 
-Boot and install Windows 11
+   * RAM: 4–8 GB
+   * CPUs: 2+
+   * Disk: 60+ GB
+3. Go to `Settings > Storage` and attach the Windows 11 ISO under **Controller: SATA**
+4. Boot and install
 
-Optional (to bypass TPM/Secure Boot):
+**Optional – Bypass TPM/Secure Boot:**
 
-Press Shift+F10 during setup
+1. Press `Shift + F10` at the setup screen
+2. Run:
 
-Run:
+   ```cmd
+   regedit
+   ```
+3. Navigate to:
+   `HKEY_LOCAL_MACHINE\SYSTEM\Setup`
+4. Create a new key: `LabConfig`
+5. Inside `LabConfig`, add these DWORD (32-bit) values:
 
-cmd
-Copy
-Edit
-regedit
-Create key LabConfig under HKEY_LOCAL_MACHINE\SYSTEM\Setup, then add DWORDs:
+   ```ini
+   BypassTPMCheck = 1
+   BypassRAMCheck = 1
+   BypassSecureBootCheck = 1
+   ```
 
-ini
-Copy
-Edit
-BypassTPMCheck       = 1
-BypassRAMCheck       = 1
-BypassSecureBootCheck = 1
-✅ 3. Windows Server (Domain Controller or File Server)
-Download ISO:
+---
 
-https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2022
+### ✅ Windows Server (Domain Controller or File Server)
 
-Steps:
+**Download ISO:**
+🔗 [https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2022](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2022)
 
-Create new VM: New > Windows Server 2022
+**Steps:**
 
-Assign 4–8 GB RAM, 2 CPUs, 60+ GB disk
+1. Create a new VM: `New > Windows Server 2022`
+2. Set:
 
-Mount the ISO under Settings > Storage
+   * RAM: 4–8 GB
+   * CPUs: 2
+   * Disk: 60+ GB
+3. Mount the ISO under `Settings > Storage`
+4. Install **with Desktop Experience**
 
-Install with Desktop Experience
+**Post-install Setup:**
 
-After install:
+* Set a static IP address
+* Rename the computer
+* Optionally, install roles via **Server Manager**:
 
-Set static IP
+  * ✅ Active Directory Domain Services
+  * ✅ DNS Server
+  * ✅ File Server
 
-Rename the computer
+---
 
-Optionally install roles via Server Manager:
+### ✅ Splunk (SIEM Platform)
 
-Active Directory Domain Services
+**Download Splunk Free:**
+🔗 [https://www.splunk.com/en\_us/download/splunk-enterprise.html](https://www.splunk.com/en_us/download/splunk-enterprise.html)
 
-DNS
+**Use Ubuntu Server as the host:**
 
-File Server
+**Ubuntu Server ISO:**
+🔗 [https://ubuntu.com/download/server](https://ubuntu.com/download/server)
 
-✅ 4. Splunk (SIEM)
-Download Free Version:
+**Steps:**
 
-https://www.splunk.com/en_us/download/splunk-enterprise.html
+1. Create a new VM: `New > Linux > Ubuntu (64-bit)`
+2. Set:
 
-Use Ubuntu Server (recommended) as the Splunk host:
+   * RAM: 2–4 GB
+   * Disk: 40+ GB
+3. Install Ubuntu
+4. After install, run:
 
-Download Ubuntu Server ISO:
+   ```bash
+   wget -O splunk.deb 'https://download.splunk.com/products/splunk/releases/9.2.0/linux/splunk-9.2.0-a7c60d41769f-linux-2.6-amd64.deb'
+   sudo dpkg -i splunk.deb
+   sudo /opt/splunk/bin/splunk start --accept-license
+   ```
 
-https://ubuntu.com/download/server
+**Access Splunk in your browser:**
+`http://<splunk-vm-ip>:8000`
 
-Create VM: New > Linux > Ubuntu (64-bit)
+---
 
-Allocate 2–4 GB RAM, 40+ GB disk
+## 🌐 Step 2: Network Configuration
 
-Install Ubuntu, then install Splunk:
+Set all VMs to the same **Host-Only Adapter** or **Internal Network** in VirtualBox:
 
-bash
-Copy
-Edit
-# After install, SSH into the VM or use terminal
-wget -O splunk.deb 'https://download.splunk.com/products/splunk/releases/9.2.0/linux/splunk-9.2.0-a7c60d41769f-linux-2.6-amd64.deb'
-sudo dpkg -i splunk.deb
-sudo /opt/splunk/bin/splunk start --accept-license
-Access Splunk in browser:
-http://<splunk-vm-ip>:8000
+```text
+Settings > Network > Adapter 1 > Attached to: Host-Only Adapter
+```
 
-🌐 Step 2: Networking
-Set all VMs to the same Host-Only Adapter or Internal Network:
+This allows your VMs to communicate **internally without internet exposure**.
 
-Settings > Network > Adapter 1 > Attached to: Host-only Adapter
+---
 
-This ensures all VMs can talk to each other privately.
+## 📦 Step 3: Post-Install Tasks
 
-📦 Step 3: Next Steps
-After installation:
+After all VMs are installed:
 
-Install Sysmon and Winlogbeat on Windows machines
+* ✅ Install **Sysmon** and **Winlogbeat** on Windows machines for advanced logging
+* ✅ Install **Filebeat** or **Wazuh Agent** on Linux systems
+* ✅ Start simulating attacks with Kali:
 
-Install Filebeat or Wazuh agent on Linux systems
+  * Port scanning
+  * SMB enumeration
+  * SSH brute-force
+  * File access
+* ✅ Forward logs into **Splunk**
 
-Start simulating attacks using Kali (port scans, SMB enumeration, brute-force, etc.)
-
-Forward logs into Splunk for correlation and dashboard creation
+  * Use Filebeat, Winlogbeat, or custom inputs
+  * Create detection rules, dashboards, and alert queries
 
 
